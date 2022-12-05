@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="xMidYMid meet" data-bbox="0 -0.003 608.698 332.88" viewBox="0 0 608.695 332.877" height="332.877" width="608.695" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" data-type="ugc" role="presentation" aria-hidden="true">
+    <g>
+        <defs>
+            <linearGradient gradientUnits="objectBoundingBox" x2=".5" y1="1" x1=".5" id="svgcid--pdezm29xk1m5">
+                <stop stop-color="#ffa769" offset="0"></stop>
+                <stop stop-color="#fd835e" offset=".37"></stop>
+                <stop stop-color="#fc6254" offset=".777"></stop>
+                <stop stop-color="#fc5651" offset="1"></stop>
+            </linearGradient>
+            <linearGradient xlink:href="#svgcid--pdezm29xk1m5" y2="-1.222" x2=".503" y1=".977" x1=".499" id="svgcid--1xm3he-51dkoy"></linearGradient>
+            <linearGradient xlink:href="#svgcid--pdezm29xk1m5" y2="-1.22" x2=".503" y1=".979" x1=".499" id="svgcid-klibpo-2230cn"></linearGradient>
+            <linearGradient xlink:href="#svgcid--pdezm29xk1m5" y2=".074" x2=".5" y1="2.047" x1=".498" id="svgcid--xvuwhn3f08av"></linearGradient>
+        </defs>
+        <g>
+            <path fill="url(#svgcid--pdezm29xk1m5)" d="M462.159 679.554H342.892a123.4 123.4 0 0 1-123.257-123.259v-86.364a123.4 123.4 0 0 1 123.257-123.254h119.267a23.777 23.777 0 0 1 0 47.554H342.892a75.79 75.79 0 0 0-75.7 75.7v86.363a75.79 75.79 0 0 0 75.7 75.7h119.267a23.777 23.777 0 0 1 0 47.554z" transform="translate(-219.635 -346.677)"></path>
+            <path fill="url(#svgcid--1xm3he-51dkoy)" transform="translate(-195.247 -331.832)" d="M528.5 664.709a23.777 23.777 0 0 1-17.82-39.509l85.5-96.938a23.779 23.779 0 0 1 35.666 31.459l-85.5 96.938a23.725 23.725 0 0 1-17.846 8.05z"></path>
+            <path fill="url(#svgcid-klibpo-2230cn)" transform="translate(-182.155 -331.832)" d="M767.081 664.709a23.726 23.726 0 0 1-17.841-8.048l-85.5-96.938a23.778 23.778 0 0 1 35.665-31.458L784.9 625.2a23.777 23.777 0 0 1-17.823 39.506z"></path>
+            <path fill="url(#svgcid--xvuwhn3f08av)" transform="translate(-195.247 -346.677)" d="M654.34 507.7a80.84 80.84 0 0 1-60.6-27.352l-83.06-94.165a23.778 23.778 0 1 1 35.665-31.458l83.059 94.17a33.243 33.243 0 0 0 49.869 0l83.058-94.17A23.778 23.778 0 0 1 798 386.183l-83.058 94.169A80.839 80.839 0 0 1 654.34 507.7z"></path>
+        </g>
+    </g>
+</svg>

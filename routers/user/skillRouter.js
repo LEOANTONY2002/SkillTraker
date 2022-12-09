@@ -27,4 +27,17 @@ router.put("/skill", async (req, res) => {
   }
 })
 
+router.post("/skill/cert", async (req, res) => {
+  const q = req.body
+  try {
+    const user = await User.find({ email: q.email }).populate({
+      path: 'skills',
+      populate: { path: 'skill', populate: { path: 'category', populate: { path: 'cert' } } }
+    })
+
+  } catch (error) {
+    return res.status(400).send(error)
+  }
+})
+
 export default router;

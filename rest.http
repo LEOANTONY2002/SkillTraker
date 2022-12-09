@@ -61,6 +61,21 @@ Content-Type: application/json
     "name": "AWS",
     "category": "63898ca38a86a2086d26571f"
 }
+###
+
+PUT {{baseUrl}}/user/skill/cert HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "elsa@changecx.com",
+    "skill": "63898cc58a86a2086d26572b",
+    "cert": {
+        "name": "asd",
+        "publisher": "qwerty",
+        "exp": "",
+        "photo": ""
+    }
+}
 
 ###
 

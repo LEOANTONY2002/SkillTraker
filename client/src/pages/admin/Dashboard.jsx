@@ -60,7 +60,7 @@ function Dashboard({ users, categories, skills, counts }) {
                         <div>
                             <img src="https://img.icons8.com/fluency-systems-regular/48/fc3737/group-background-selected.png" />
                             <p>Employees</p>
-                            <div className='gt'>{users.length}</div>
+                            <div className='gt'>{users.length - 1}</div>
                         </div>
                         <div>
                             <img src="https://img.icons8.com/fluency-systems-filled/48/fc3737/category.png" />
@@ -73,7 +73,7 @@ function Dashboard({ users, categories, skills, counts }) {
                             <div className='gt'>{skills.length}</div>
                         </div>
                     </div>
-                    <div className="chart">
+                    {/* <div className="chart">
                         <div className='ad-head'>
                             <img src="https://img.icons8.com/fluency-systems-filled/48/ffffff/category.png" />
                             <p>Admin</p>
@@ -82,7 +82,7 @@ function Dashboard({ users, categories, skills, counts }) {
                             <p style={{ fontSize: 'small' }}>{user.email}</p>
                             <button onClick={() => setEdit({ ...edit, open: true })}>Update</button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="d-cats">
                     <p className='d-title'>Categories</p>
@@ -154,7 +154,7 @@ function Dashboard({ users, categories, skills, counts }) {
                 }) : <div>No users found</div>}
             </div>
 
-            {edit.open && (
+            {/* {edit.open && (
                 <div style={{ position: "fixed" }} className='c-edit'>
                     <div>
                         <div className="ce-head">
@@ -170,7 +170,7 @@ function Dashboard({ users, categories, skills, counts }) {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
         </div>
     )

@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
       {
         skill: { type: mongoose.Schema.Types.ObjectId, ref: 'Skill' },
         exp: String,
+        cert: { type: mongoose.Schema.Types.ObjectId, ref: 'certificate' },
         upd: {
           type: Date,
           default: dt

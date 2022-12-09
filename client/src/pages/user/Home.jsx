@@ -6,6 +6,7 @@ import logo from '../../assets/icon.svg'
 import Edit from './Edit'
 import './Home.css'
 import Profile from './Profile'
+import Upload from './Upload'
 
 function Home() {
     const { user } = useSelector((state) => state.user)
@@ -46,8 +47,8 @@ function Home() {
                         <img src="https://img.icons8.com/fluency-systems-regular/48/ffffff/group-background-selected.png" />
                     </div>
                 </div>
-                <div onClick={() => setPage("logout")} className='h-div'>
-                    <p>Logout</p>
+                <div onClick={() => setPage("upload")} className='h-div'>
+                    <p>Uploads</p>
                     <div>
                         <img src="https://img.icons8.com/fluency-systems-filled/48/ffffff/exit.png" />
                     </div>
@@ -55,6 +56,7 @@ function Home() {
             </main>
             {page === "profile" && <Profile />}
             {page === "edit" && <Edit setPage={setPage} />}
+            {page === "upload" && <Upload />}
         </div>
     )
 }

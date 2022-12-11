@@ -1,6 +1,7 @@
 .e-body::-webkit-scrollbar {
     display: none;
 }
+
 .e-main {
     display: flex;
     align-items: center;
@@ -11,17 +12,20 @@
     width: calc(100vw - 200px);
     min-height: 80vh;
 }
+
 .emp {
     display: flex;
     flex-direction: column;
     font-size: small;
     font-weight: bold;
 }
+
 .e-head {
     display: flex;
     align-items: center;
 }
-.e-head > img {
+
+.e-head>img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -29,12 +33,14 @@
     box-shadow: 0 2px 20px rgba(250, 172, 172, 0.212);
     border: 5px solid rgba(255, 255, 255, 0.831);
 }
-.e-title{
+
+.e-title {
     display: flex;
     align-items: center;
     border-radius: 5px;
     padding: 8px;
 }
+
 .e-title div {
     padding: 10px 20px;
     padding-right: 60px;
@@ -44,6 +50,7 @@
     background-color: #ffffff;
     box-shadow: 0 2px 20px rgba(250, 172, 172, 0.212);
 }
+
 .e-title img {
     width: 15px;
     background: linear-gradient(120deg, red, orange);
@@ -53,6 +60,7 @@
     border: 5px solid #ffeded;
     cursor: pointer;
 }
+
 .e-title p {
     font-size: 20px;
     background: linear-gradient(120deg, red, orange);
@@ -60,15 +68,18 @@
     color: transparent;
     background-clip: text;
 }
+
 .e-title span {
     font-size: smaller;
     color: #e1e1e1;
 }
+
 .e-body {
     display: flex;
     align-items: center;
     margin-left: 70px;
 }
+
 .e-body p {
     background: linear-gradient(120deg, rgb(255, 219, 219), rgb(255, 223, 210));
     border-radius: 50%;
@@ -79,6 +90,7 @@
     display: grid;
     place-content: center;
 }
+
 .e-body span {
     font-size: smaller;
     margin-left: 2px;
@@ -98,7 +110,8 @@
     flex-wrap: wrap;
     gap: 50px;
 }
-.u-prof > img {
+
+.u-prof>img {
     width: 25px;
     padding: 7px;
     position: absolute;
@@ -109,12 +122,14 @@
     border-radius: 50%;
     cursor: pointer;
 }
+
 .up-main {
     background-color: #fffbfb;
     border-radius: 30px;
     width: max-content;
     box-shadow: 0 2px 20px rgba(250, 172, 172, 0.212);
 }
+
 .up-head {
     display: flex;
     flex-direction: column;
@@ -122,7 +137,8 @@
     position: relative;
     justify-content: center;
 }
-.up-head > div {
+
+.up-head>div {
     border-radius: 50%;
     padding: 10px;
     display: grid;
@@ -130,23 +146,28 @@
     background-color: #ffeded;
     margin: 20px;
 }
-.up-head > div > img {
+
+.up-head>div>img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.705);
     z-index: 2;
+    background: linear-gradient(120deg, red, rgb(255, 136, 0));
 }
-.up-head > p {
+
+.up-head>p {
     width: 100%;
     height: 2px;
     background-color: #ffeded;
     position: absolute;
 }
+
 .up-title {
     text-align: center;
     margin-bottom: 20px;
 }
+
 .up-title p {
     font-size: 30px;
     font-weight: bolder;
@@ -157,10 +178,12 @@
     color: transparent;
     background-clip: text;
 }
+
 .up-title span {
     font-size: smaller;
     color: #e1e1e1;
 }
+
 .up-body {
     margin-top: 20px;
     padding: 10px;
@@ -171,6 +194,7 @@
     gap: 20px;
     flex: 0.4;
 }
+
 .eb-skill {
     width: 150px;
     display: flex;
@@ -180,11 +204,13 @@
     font-size: small;
     box-shadow: 0 2px 10px rgba(250, 172, 172, 0.212);
 }
+
 .ebs-head {
     display: flex;
     align-items: center;
     padding: 5px;
 }
+
 .ebs-head img {
     width: 18px;
     padding: 5px;
@@ -192,26 +218,29 @@
     background-color: #fee8e8;
     border-radius: 50%;
 }
+
 .eb-skill p {
     font-size: smaller;
     font-weight: bold;
 }
+
 .eb-skill span {
     color: rgb(167, 167, 167);
     display: flex;
     font-size: 9px;
 }
+
 .eb-skill h5 {
     background-color: #fee8e8;
     padding: 5px 15px;
     text-align: center;
 }
+
 .eb-skill h6 {
     padding: 5px 15px;
     text-align: center;
     color: rgb(169, 169, 169);
 }
-
 
 @media (max-width: 700px) {
     .employee {
@@ -221,7 +250,7 @@
     .e-main {
         width: 100vw;
     }
-    .employee > h4 {
+    .employee>h4 {
         margin-left: 80px;
         margin-top: 30px;
     }

@@ -12,21 +12,25 @@
     margin: auto;
     padding: 20px;
 }
+
 .u-skill {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
+
 .u-main {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+
 .us-head {
     display: flex;
     align-items: center;
 }
+
 .us-head img {
     background-color: #fde5e5;
     /* background: linear-gradient(120deg, rgb(255, 45, 45), #ff815a); */
@@ -38,6 +42,7 @@
     padding: 5px;
     margin-right: 7px;
 }
+
 .us-head div {
     padding: 10px 20px;
     border-radius: 50px;
@@ -47,6 +52,7 @@
     align-items: center;
     font-size: small;
 }
+
 .us-head h4 {
     width: 5px;
     height: 5px;
@@ -55,20 +61,24 @@
     border-radius: 50px;
     margin-right: 2px;
 }
+
 .us-head span {
     font-size: smaller;
 }
+
 .us-body {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
 }
+
 .us-body span {
     height: 13px;
     width: 2px;
     background-color: #ff815a;
 }
+
 .us-body img {
     background: linear-gradient(120deg, rgb(255, 45, 45), #ff815a);
     cursor: pointer;
@@ -78,14 +88,21 @@
     border-radius: 50%;
     padding: 5px;
 }
+
 .u-cert {
-    width: 200px;
-    height: 150px;
     padding: 20px;
     border-radius: 20px;
-    background-color: #fde5e5;
+    background-color: #fef0f0;
     margin: 10px 0;
 }
+
+.u-cert img {
+    object-fit: contain;
+    width: 200px;
+    height: 150px;
+    box-shadow: 0 2px 10px rgba(13, 13, 13, 0.265);
+}
+
 .u-upl {
     position: fixed;
     width: 100vw;
@@ -97,13 +114,15 @@
     top: 0;
     left: 0;
 }
+
 .u-upl .l-body {
     position: relative;
     background-color: #fff6f6;
     box-shadow: 0 4px 30px rgba(250, 172, 172, 0.29);
     padding-top: 60px;
 }
-.u-upl .l-body > img {
+
+.u-upl .l-body>img {
     width: 20px;
     padding: 7px;
     position: absolute;

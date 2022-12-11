@@ -1,4 +1,5 @@
 import express from "express";
+import Certificate from "../../models/certificateModel.js";
 import User from "../../models/userModel.js";
 
 const router = express.Router()
@@ -30,11 +31,24 @@ router.put("/skill", async (req, res) => {
 router.post("/skill/cert", async (req, res) => {
   const q = req.body
   try {
-    const user = await User.find({ email: q.email }).populate({
-      path: 'skills',
-      populate: { path: 'skill', populate: { path: 'category', populate: { path: 'cert' } } }
+    // const cert = await Certificate.find({ email: q.email })
+    const cert = await new Certificate({
+      email: q.email,
+      name: q.name,
+      publisher: q.publisher,
+      exp: q.exp,
+      photo: q.photo,
     })
-
+    const savedCert = await cert.save()
+    if (savedCert) {
+      const user = await User.find({email: q.email}).populate({
+        path: 'skills',
+        populate: { path: 'skill', populate: { path: 'category', populate: {path: 'Cert'} } }
+      })
+      res.send(user)
+    } else {
+      return res.status(400).send("error")
+    }
   } catch (error) {
     return res.status(400).send(error)
   }

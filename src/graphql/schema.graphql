@@ -40,11 +40,19 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Employee {
+  accessToken: String
   createdAt: DateTime
+  department: String
+  displayName: String
+  division: String
   email: String
   employeeSkills: [EmployeeSkills]
   id: String
   isManager: Boolean
+  jobTitle: String
+  location: String
+  manager: String
+  mobileNumber: String
   name: String
   photo: String
   role: String

@@ -27,16 +27,16 @@ export const Employee = objectType({
     t.string("role");
     t.boolean("isManager");
     t.list.field("employeeSkills", { type: "EmployeeSkills" });
-    // t.string("accessToken");
+    t.string("accessToken");
     t.field("createdAt", { type: "DateTime" });
     t.field("updatedAt", { type: "DateTime" });
-    // t.string("displayName");
-    // t.string("jobTitle");
-    // t.string("mobileNumber");
-    // t.string("department");
-    // t.string("location");
-    // t.string("division");
-    // t.string("manager");
+    t.string("displayName");
+    t.string("jobTitle");
+    t.string("mobileNumber");
+    t.string("department");
+    t.string("location");
+    t.string("division");
+    t.string("manager");
   },
 });
 

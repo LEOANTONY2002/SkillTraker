@@ -1,0 +1,98 @@
+html::-webkit-scrollbar,
+.users::-webkit-scrollbar {
+  display: none;
+}
+
+.menu {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 100vh;
+  margin: auto 20px;
+  color: white;
+  z-index: 20;
+  top: 0px;
+}
+
+.cx {
+  background: linear-gradient(120deg, #fcdfdf, transparent);
+  width: max-content;
+  padding: 10px;
+  border-radius: 50%;
+  margin-left: 8px;
+  /* border: 4px solid rgb(251, 233, 233); */
+  box-shadow: 0 3px 20px rgba(252, 127, 127, 0.361);
+}
+.cx img {
+  width: 25px;
+}
+.nav {
+  background-color: #fc3737;
+  border-radius: 20px;
+  box-shadow: 0 3px 20px rgba(255, 90, 90, 0.361);
+  transition: all 0.2s ease-in-out;
+  width: 70px;
+}
+.nav img {
+  width: 25px;
+}
+.nav div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  cursor: pointer;
+  font-size: small;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+.nav p {
+  visibility: hidden;
+  transition: all 0.2s ease-in-out;
+}
+.nav div:first-of-type {
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
+}
+.nav div:last-of-type {
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+.nav div:hover {
+  background-color: rgb(254, 78, 78);
+  transform: scale(1.1);
+}
+
+.nav:hover {
+  width: 200px;
+}
+.nav:hover p {
+  box-shadow: 0 3px 20px rgba(255, 90, 90, 0.361);
+  visibility: visible;
+}
+.admin > main {
+  margin: auto;
+}
+
+@media (max-width: 700px) {
+  .menu {
+    justify-content: flex-start;
+    margin: 20px;
+    margin-left: 5px;
+  }
+  .nav {
+    transform: translateY(-200%);
+    opacity: 0;
+  }
+  .cx {
+    cursor: pointer;
+    z-index: 10;
+  }
+  .menu:hover .nav {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

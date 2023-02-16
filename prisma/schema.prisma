@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  photo          String?
+  password       String
+  role           String?
+  isManager      Boolean
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  employeeSkills EmployeeSkills[]
+}
+
+model EmployeeSkills {
+  id          String             @id @default(uuid())
+  employee    Employee           @relation(fields: [employeeId], references: [id])
+  employeeId  String
+  skill       CategoriesOnSkills @relation(fields: [skillId], references: [id])
+  skillId     String
+  certificate Certificates?
+  level       String
+  updateLog   Json[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model Skills {
+  id         String               @id @default(uuid())
+  name       String               @unique
+  categories CategoriesOnSkills[]
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+}
+
+model Categories {
+  id        String               @id @default(uuid())
+  name      String               @unique
+  skills    CategoriesOnSkills[]
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+}
+
+model CategoriesOnSkills {
+  id             String           @id @default(uuid())
+  skill          Skills           @relation(fields: [skillId], references: [id])
+  skillId        String
+  category       Categories       @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  employeeSkills EmployeeSkills[]
+}
+
+model Certificates {
+  id              String         @id @default(uuid())
+  name            String
+  publisher       Publishers     @relation(fields: [publisherId], references: [id])
+  publisherId     String
+  expiry          String
+  photo           String
+  updateLog       Json[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  employeeSkill   EmployeeSkills @relation(fields: [employeeSkillId], references: [id])
+  employeeSkillId String         @unique
+}
+
+model Publishers {
+  id           String         @id @default(uuid())
+  name         String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  certificates Certificates[]
+}

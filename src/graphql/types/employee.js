@@ -97,7 +97,7 @@ export const searchEmployee = extendType({
           include: {
             employeeSkills: {
               include: {
-                certificate: true,
+                certificate: {include: {publisher: true}},                 
                 skill: {
                   include: {
                     category: true,
@@ -140,7 +140,7 @@ export const searchEmployeeBySkill = extendType({
           include: {
             employeeSkills: {
               include: {
-                certificate: true,
+                certificate: {include: {publisher: true}},                 
                 skill: {
                   include: {
                     category: true,
@@ -183,7 +183,7 @@ export const searchEmployeeByCategory = extendType({
           include: {
             employeeSkills: {
               include: {
-                certificate: true,
+                certificate: {include: {publisher: true}},               
                 skill: {
                   include: {
                     category: true,
@@ -216,7 +216,7 @@ export const searchEmployeeByCategory = extendType({
 //             include: {
 //               employeeSkills: {
 //                 include: {
-//                   certificate: true,
+//                   certificate: {include: {publisher: true}},                 
 //                   skill: {
 //                     include: {
 //                       skill: true,
@@ -355,7 +355,7 @@ export const addEmployee = extendType({
               include: {
                 employeeSkills: {
                   include: {
-                    certificate: true,
+                    certificate: {include: {publisher: true}},                 
                     skill: {
                       include: {
                         skill: true,

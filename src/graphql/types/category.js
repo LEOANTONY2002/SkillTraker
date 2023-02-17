@@ -29,7 +29,7 @@ export const allCategories = extendType({
                 skill: true,
                 employeeSkills: {
                   include: {
-                    certificate: true,
+                    certificate: {include: {publisher: true}},                 
                     employee: true,
                     skill: {
                       include: {
@@ -69,7 +69,9 @@ export const getCategory = extendType({
                   skill: true,
                   employeeSkills: {
                     include: {
-                      certificate: true,
+                      certificate: {include: {publisher: true}
+                    
+},                 
                       employee: true,
                       skill: {
                         include: {
@@ -121,7 +123,9 @@ export const addCategory = extendType({
                 skill: true,
                 employeeSkills: {
                   include: {
-                    certificate: true,
+                    certificate: {include: {publisher: true}
+                    
+},                 
                     employee: true,
                     skill: {
                       include: {
@@ -190,7 +194,9 @@ export const deleteCategory = extendType({
                 skill: true,
                 employeeSkills: {
                   include: {
-                    certificate: true,
+                    certificate: {include: {publisher: true}
+                    
+},                 
                     employee: true,
                     skill: {
                       include: {
@@ -233,7 +239,9 @@ export const searchCategory = extendType({
                   skill: true,
                   employeeSkills: {
                     include: {
-                      certificate: true,
+                      certificate: {include: {publisher: true}
+                    
+},                 
                       employee: true,
                       skill: {
                         include: {

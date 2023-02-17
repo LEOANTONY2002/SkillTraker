@@ -29,7 +29,7 @@ export const EmployeeSkills = objectType({
 //       async resolve(_root, args, ctx) {
 //         return await prisma.employeeSkills.findMany({
 //           // include: {
-//           //   certificate: true,
+//           //   certificate: {include: {publisher: true}},                 
 //           //   skill: {
 //           //     include: {
 //           //       skill: true,
@@ -57,7 +57,7 @@ export const EmployeeSkills = objectType({
 //             employeeId: args.employeeId,
 //           },
 //           include: {
-//             certificate: true,
+//             certificate: {include: {publisher: true}},                 
 //             skill: {
 //               include: {
 //                 skill: true,
@@ -110,7 +110,7 @@ export const addEmployeeSkill = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}},                 
                   skill: {
                     include: {
                       skill: true,
@@ -153,7 +153,7 @@ export const deleteEmployeeSkills = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}},                 
                   skill: {
                     include: {
                       skill: true,

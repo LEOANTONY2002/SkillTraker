@@ -33,7 +33,7 @@ export const allCOS = extendType({
               category: true,
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}},                 
                   employee: true,
                   skill: {
                     include: {
@@ -120,7 +120,7 @@ export const addSkill = extendType({
               category: true,
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}},                 
                   employee: true,
                   skill: {
                     include: {
@@ -169,7 +169,9 @@ export const deleteSkill = extendType({
               category: true,
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}
+                    
+},                 
                   employee: true,
                   skill: {
                     include: {
@@ -209,7 +211,9 @@ export const searchSkill = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {include: {publisher: true}
+                    
+},                 
                   skill: true,
                   employee: true,
                 },

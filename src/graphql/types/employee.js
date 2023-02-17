@@ -449,7 +449,11 @@ export const editEmployee = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: true,
+                  certificate: {
+                    include: {
+                      publisher: true
+                    }
+                  },
                   skill: {
                     include: {
                       skill: true,

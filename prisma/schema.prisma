@@ -13,12 +13,19 @@ datasource db {
 
 model Employee {
   id             String           @id @default(uuid())
-  name           String
+  name           String?
+  displayName    String?
   email          String           @unique
   photo          String?
   password       String
-  role           String?
-  isManager      Boolean
+  jobTitle       String?
+  manager        String?
+  location       String?
+  mobileNumber   String?
+  department     String?
+  division       String?
+  isAdmin        Boolean          @default(false)
+  isNewEmployee  Boolean          @default(true)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   employeeSkills EmployeeSkills[]

@@ -105,11 +105,7 @@ export const addSkill = extendType({
                   },
                 },
               },
-            },
-            include: {
-              skill: true,
-              category: true,
-            },
+            }
           })
           .catch(prismaErr);
 

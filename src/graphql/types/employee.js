@@ -24,8 +24,6 @@ export const Employee = objectType({
     t.string("name");
     t.string("email");
     t.string("photo");
-    t.string("role");
-    t.boolean("isManager");
     t.list.field("employeeSkills", { type: "EmployeeSkills" });
     t.string("accessToken");
     t.field("createdAt", { type: "DateTime" });
@@ -37,6 +35,8 @@ export const Employee = objectType({
     t.string("location");
     t.string("division");
     t.string("manager");
+    t.boolean("isAdmin");
+    t.boolean("isNewEmployee");
   },
 });
 
@@ -233,6 +233,134 @@ export const searchEmployeeByCategory = extendType({
 //   },
 // });
 
+export const allAdmins = extendType({
+  type: "Query",
+  definition(t) {
+    t.list.field("allAdmins", {
+      type: "Employee",
+      async resolve() {
+        return await prisma.employee.findMany({
+          where: {
+            isAdmin: true
+          }
+        })
+      }
+    })
+  }
+})
+
+export const manageAdmin = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.list.field("manageAdmin", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+        isAdmin: nonNull(booleanArg())
+      },
+      async resolve(_root, args, ctx) {
+        await prisma.employee
+          .update({
+            where: {
+              email: args.email,
+            },
+            data: {
+              isAdmin: args.isAdmin,
+            },
+          })
+          .catch(prismaErr);
+
+        return await prisma.employee
+          .findMany({
+            where: {
+              isAdmin: true
+            }
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+})
+
+export const syncEmployeesData = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.list.field("syncEmployeesData", {
+      type: "Employee",
+      async resolve() {
+        const { data } = await axios.get(
+          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        );
+        const options = {
+          ignoreAttributes: true,
+        };
+
+        const parser = new XMLParser(options);
+        let employees = parser.parse(data);
+
+        employees?.directory?.employees?.employee?.map(
+          async (e) => {
+            await prisma.employee
+              .upsert({
+                where: {
+                  email: e?.field[6],
+                },
+                update: {
+                  // password: "",
+                  name: e?.field[0],
+                  displayName: e?.field[0],
+                  jobTitle: e?.field[4],
+                  mobileNumber: e?.field[5].toString(),
+                  department: e?.field[7],
+                  location: e?.field[8],
+                  division: e?.field[9],
+                  manager: e?.field[12],
+                  photo: e?.field[14],
+                  // isAdmin: false,
+                  isNewEmployee: false
+                },
+                create: {
+                  email: e?.field[6],
+                  password: "",
+                  name: e?.field[0],
+                  displayName: e?.field[0],
+                  jobTitle: e?.field[4],
+                  mobileNumber: e?.field[5].toString(),
+                  department: e?.field[7],
+                  location: e?.field[8],
+                  division: e?.field[9],
+                  manager: e?.field[12],
+                  photo: e?.field[14],
+                  isAdmin: false,
+                  isNewEmployee: true
+                }
+              })
+            }
+        );
+        return await prisma.employee.findMany({
+          include: {
+            employeeSkills: {
+              include: {
+                certificate: {
+                  include: {
+                    publisher: true,
+                  },
+                },
+                skill: {
+                  include: {
+                    category: true,
+                    skill: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+    })
+  }
+})
+
 export const employeeLogin = extendType({
   type: "Mutation",
   definition(t) {
@@ -240,16 +368,64 @@ export const employeeLogin = extendType({
       type: "Employee",
       args: {
         email: nonNull(stringArg()),
-        password: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-        const dbEmployee = await prisma.employee
-          .findFirst({
+
+        const { data } = await axios.get(
+          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        );
+        const options = {
+          ignoreAttributes: true,
+        };
+
+        const parser = new XMLParser(options);
+        let employees = parser.parse(data);
+
+        let existingEmployee =
+          employees?.directory?.employees?.employee?.find(
+            (e) => e?.field[6] === args.email
+          );
+
+        if (existingEmployee) {
+          console.log(existingEmployee);
+          const accessToken = jwt.sign(
+            { email: args.email },
+            process.env.SECRET_TOKEN,
+            { expiresIn: "10m" }
+          );
+          console.log(accessToken);
+          const employee = await prisma.employee
+          .upsert({
             where: {
-              AND: {
-                email: args.email,
-                password: args.password,
-              },
+              email: args.email,
+            },
+            update: {
+              password: "",
+              name: existingEmployee?.field[0],
+              displayName: existingEmployee?.field[0],
+              jobTitle: existingEmployee?.field[4],
+              mobileNumber: existingEmployee?.field[5].toString(),
+              department: existingEmployee?.field[7],
+              location: existingEmployee?.field[8],
+              division: existingEmployee?.field[9],
+              manager: existingEmployee?.field[12],
+              photo: existingEmployee?.field[14],
+              isNewEmployee: true
+            },
+            create: {
+              email: args.email,
+              password: "",
+              name: existingEmployee?.field[0],
+              displayName: existingEmployee?.field[0],
+              jobTitle: existingEmployee?.field[4],
+              mobileNumber: existingEmployee?.field[5].toString(),
+              department: existingEmployee?.field[7],
+              location: existingEmployee?.field[8],
+              division: existingEmployee?.field[9],
+              manager: existingEmployee?.field[12],
+              photo: existingEmployee?.field[14],
+              isAdmin: false,
+              isNewEmployee: true
             },
             include: {
               employeeSkills: {
@@ -269,54 +445,46 @@ export const employeeLogin = extendType({
               },
             },
           })
-          .catch(prismaErr);
-        // const pwVerify = await bcrypt.compare(args.password, employee.password);
+          // .catch(prismaErr);
 
-        if (dbEmployee) {
-          const { data } = await axios.get(
-            "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
-          );
-          const options = {
-            ignoreAttributes: true,
+          console.log(employee);
+
+          return {
+            ...employee,
+            accessToken,
           };
 
-          const parser = new XMLParser(options);
-          let employees = parser.parse(data);
-
-          let existingEmployee =
-            employees?.directory?.employees?.employee?.find(
-              (e) => e?.field[6] === args.email
-            );
-
-          if (existingEmployee) {
-            const accessToken = jwt.sign(
-              { email: args.email },
-              process.env.SECRET_TOKEN,
-              { expiresIn: "10m" }
-            );
-
-            let employee = {
-              ...dbEmployee,
-              displayName: existingEmployee?.field[0],
-              jobTitle: existingEmployee?.field[4],
-              mobileNumber: existingEmployee?.field[5],
-              department: existingEmployee?.field[7],
-              location: existingEmployee?.field[8],
-              division: existingEmployee?.field[9],
-              manager: existingEmployee?.field[12],
-              photo: existingEmployee?.field[14],
-            };
-
-            return {
-              ...employee,
-              accessToken,
-            };
-          }
         }
+        
+        // const pwVerify = await bcrypt.compare(args.password, employee.password);
+
       },
     });
   },
 });
+
+export const employeePasswordReset = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("employeePasswordReset", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+        password: nonNull(stringArg()),
+      },
+      async resolve(args) {
+        return await prisma.employee.update({
+          where: {
+            email: args.email
+          },
+          data: {
+            password: args.password
+          }
+        })
+      }
+    })
+  }
+})
 
 export const addEmployee = extendType({
   type: "Mutation",

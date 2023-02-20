@@ -48,14 +48,14 @@ type Employee {
   email: String
   employeeSkills: [EmployeeSkills]
   id: String
-  isManager: Boolean
+  isAdmin: Boolean
+  isNewEmployee: Boolean
   jobTitle: String
   location: String
   manager: String
   mobileNumber: String
   name: String
   photo: String
-  role: String
   updatedAt: DateTime
 }
 
@@ -76,7 +76,7 @@ type Mutation {
   addCategory(id: String, name: String!): [Categories]
   addCertificate(employeeId: String!, employeeSkillId: String!, expiry: String, id: String, name: String!, photo: String!, publisherId: String!): Employee
   addEmployee(email: String!, isManager: Boolean, name: String!, password: String!, photo: String, role: String): Employee
-  addEmployeeSkill(coskillId: String!, employeeId: String!, level: String!): Employee
+  addEmployeeSkill(coskillId: String!, employeeId: String!, id: String, level: String!): Employee
   addPublisher(id: String!, name: String!): [Publishers]
   addSkill(categoryId: String!, name: String!): [CategoriesOnSkills]
   deleteCategory(id: String!): [Categories]
@@ -87,7 +87,10 @@ type Mutation {
   editCategory(id: String!, name: String): Categories
   editEmployee(email: String!, id: String!, name: String!, photo: String): Employee
   editSkill(categoryId: String!, id: String!, name: String!, skillId: String!): [CategoriesOnSkills]
-  employeeLogin(email: String!, password: String!): Employee
+  employeeLogin(email: String!): Employee
+  employeePasswordReset(email: String!, password: String!): Employee
+  manageAdmin(email: String!, isAdmin: Boolean!): [Employee]
+  syncEmployeesData: [Employee]
 }
 
 type Publishers {
@@ -99,6 +102,7 @@ type Publishers {
 }
 
 type Query {
+  allAdmins: [Employee]
   allCOS: [CategoriesOnSkills]
   categories: [Categories]
   category(id: String!): Categories

@@ -78,23 +78,23 @@ export const addEmployeeSkill = extendType({
     t.field("addEmployeeSkill", {
       type: "Employee",
       args: {
+        id: stringArg(),
         employeeId: nonNull(stringArg()),
         coskillId: nonNull(stringArg()),
         level: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-        // let existingSkill = await prisma.employeeSkills
-        //   .findFirstOrThrow({
-        //     where: {
-        //       skillId: args.coskillId,
-        //     },
-        //   })
-        //   .catch(prismaErr);
-
-        // if (existingSkill == null) {
         await prisma.employeeSkills
-          .create({
-            data: {
+          .upsert({
+            where: {
+              id: args.id ?? ""
+            },
+            create: {
+              employeeId: args.employeeId,
+              skillId: args.coskillId,
+              level: args.level,
+            },
+            update: {
               employeeId: args.employeeId,
               skillId: args.coskillId,
               level: args.level,
@@ -122,7 +122,6 @@ export const addEmployeeSkill = extendType({
             },
           })
           .catch(prismaErr);
-        // }
       },
     });
   },

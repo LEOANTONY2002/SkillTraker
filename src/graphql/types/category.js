@@ -22,6 +22,11 @@ export const allCategories = extendType({
       type: "Categories",
       async resolve(_root, args) {
         return await prisma.categories.findMany({
+          orderBy: {
+            skills: {
+              _count: 'desc'
+            }
+          },
           include: {
             skills: {
               include: {

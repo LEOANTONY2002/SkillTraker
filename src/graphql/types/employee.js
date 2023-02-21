@@ -40,6 +40,16 @@ export const Employee = objectType({
   },
 });
 
+export const Sync = objectType({
+  name: "Sync",
+  definition(t) {
+    t.string("id");
+    t.field("lastSync", { type: "DateTime" });
+    t.field("createdAt", { type: "DateTime" });
+    t.field("updatedAt", { type: "DateTime" });
+  }
+})
+
 export const allEmployees = extendType({
   type: "Query",
   definition(t) {
@@ -282,12 +292,30 @@ export const manageAdmin = extendType({
   },
 })
 
+export const lastSync = extendType({
+  type: "Query",
+  definition(t) {
+    t.field("lastSync", {
+      type: "Sync",
+      async resolve() {
+        return await prisma.sync.findFirst({
+          orderBy: {
+            id: 'asc'
+          }
+        })
+      }
+    })
+  }
+})
+
 export const syncEmployeesData = extendType({
   type: "Mutation",
   definition(t) {
     t.list.field("syncEmployeesData", {
       type: "Employee",
       async resolve() {
+        let currentDateTime = new Date()
+
         const { data } = await axios.get(
           "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
         );
@@ -337,6 +365,13 @@ export const syncEmployeesData = extendType({
               })
             }
         );
+
+        await prisma.sync.create({
+          data: {
+            lastSync: currentDateTime
+          }
+        })
+
         return await prisma.employee.findMany({
           include: {
             employeeSkills: {

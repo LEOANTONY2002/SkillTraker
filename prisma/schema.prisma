@@ -92,3 +92,10 @@ model Publishers {
   updatedAt    DateTime       @updatedAt
   certificates Certificates[]
 }
+
+model Sync {
+  id           Int         @id @default(autoincrement())
+  lastSync     DateTime       
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}

@@ -28,6 +28,11 @@ export const allCOS = extendType({
       async resolve(_root, args, ctx) {
         return await prisma.categoriesOnSkills
           .findMany({
+            orderBy: {
+              employeeSkills: {
+                _count: "desc"
+              }
+            },
             include: {
               skill: true,
               category: true,

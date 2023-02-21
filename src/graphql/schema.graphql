@@ -109,6 +109,7 @@ type Query {
   certificates: [Certificates]
   cos(skillId: String!): [CategoriesOnSkills]
   employees: [Employee]
+  lastSync: Sync
   publishers: [Publishers]
   searchCategory(word: String!): [Categories]
   searchCertificate(word: String!): [Certificates]
@@ -126,5 +127,12 @@ type Skills {
   createdAt: DateTime
   id: String
   name: String
+  updatedAt: DateTime
+}
+
+type Sync {
+  createdAt: DateTime
+  id: String
+  lastSync: DateTime
   updatedAt: DateTime
 }

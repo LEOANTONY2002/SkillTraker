@@ -1,21 +1,40 @@
 import nodemailer from 'nodemailer'
 
-export const mail = async () => {
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        auth: {
-          user: "leoantony20015@gmail.com", // generated ethereal user
-          pass: "Tesla@369", // generated ethereal password
-        },
-    });
-    
-    let info = await transporter.sendMail({
-        from: '"Fred Foo 👻" <leo.antony@changecx.com>', // sender address
-        to: "leo.antony@changecx.com", // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
-        html: "<b>Hello world?</b>", // html body
-    });
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: "communication.changecx@gmail.com",
+        pass: "dkelxnkouyryvvqn", 
+    },
+});
 
-    console.log(info)
+export const mailToPasswordChange = async (to, name, password) => {
+    await transporter.sendMail({
+        from: "ChangeCX", 
+        to, 
+        subject: "One Time Password", 
+        text: "Password Change", 
+        html: `
+            Hi ${name},
+            <br />
+            Your password : <b>${password}</b>
+            <br />
+            This is the One Time Password, use this password to change a new password for your ChangeCX Skill Tool account
+        `,
+    });
+}
+
+export const mailToCertificateUpload = async (to, name, employeeName, skillName) => {
+    await transporter.sendMail({
+        from: "ChangeCX", 
+        to, 
+        subject: "One Time Password", 
+        text: "Password Change", 
+        html: `
+            Hi ${name},
+            <br />
+            ${employeeName} has just updated a certificate for the skill ${skillName}.
+            <br />
+        `,
+    });
 }

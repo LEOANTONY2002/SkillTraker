@@ -79,8 +79,10 @@ type Mutation {
   addEmployeeSkill(coskillId: String!, employeeId: String!, id: String, level: String!): Employee
   addPublisher(id: String!, name: String!): [Publishers]
   addSkill(categoryId: String!, name: String!): [CategoriesOnSkills]
+  deleteAllEmployees: Employee
   deleteCategory(id: String!): [Categories]
   deleteCertificate(employeeId: String!, id: String!): Employee
+  deleteEmployee(id: String!): Employee
   deleteEmployeeSkill(employeeId: String!, eskillId: String!): Employee
   deletePublisher(id: String!): [Publishers]
   deleteSkill(coskillId: String!, id: String!): [CategoriesOnSkills]
@@ -88,7 +90,8 @@ type Mutation {
   editEmployee(email: String!, id: String!, name: String!, photo: String): Employee
   editSkill(categoryId: String!, id: String!, name: String!, skillId: String!): [CategoriesOnSkills]
   employeeLogin(email: String!): Employee
-  employeePasswordReset(email: String!, password: String!): Employee
+  employeeLoginWithPassword(email: String!, password: String!): Employee
+  employeePasswordReset(id: String!, password: String!): Employee
   manageAdmin(email: String!, isAdmin: Boolean!): [Employee]
   syncEmployeesData: [Employee]
 }
@@ -128,6 +131,10 @@ type Skills {
   id: String
   name: String
   updatedAt: DateTime
+}
+
+type Subscription {
+  jwt: String
 }
 
 type Sync {

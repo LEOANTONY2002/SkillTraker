@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { extendType, idArg, nonNull, objectType, stringArg } from "nexus";
+import { mailToCertificateUpload } from "../../../mail/index.js";
 import { prismaErr } from "../prismaError.js";
 
 const prisma = new PrismaClient();
@@ -62,7 +63,7 @@ export const addCertificate = extendType({
         employeeId: nonNull(stringArg()),
       },
       async resolve(_root, args) {
-        await prisma.certificates
+        const certificate = await prisma.certificates
           .upsert({
             where: {
               employeeSkillId: args.employeeSkillId,
@@ -80,8 +81,24 @@ export const addCertificate = extendType({
               expiry: args.expiry ?? "",
               employeeSkillId: args.employeeSkillId,
             },
+            include: {
+              employeeSkill: {
+                include: {
+                  employee: true,
+                  skill: {
+                    include: {
+                      skill: true,
+                    }
+                  }
+                }
+              }
+            }
           })
           .catch(prismaErr);
+
+        const admins = await prisma.employee.findMany({where: {isAdmin: true}})
+
+        admins?.map(a => mailToCertificateUpload(a?.email, a?.name, certificate?.employeeSkill?.employee?.name, certificate?.employeeSkill?.skill?.skill?.name))
 
         return await prisma.employee
           .findUniqueOrThrow({

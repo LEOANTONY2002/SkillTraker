@@ -7,15 +7,26 @@ import {
   arg,
   inputObjectType,
   booleanArg,
+  subscriptionType,
 } from "nexus";
 import { prismaErr } from "../prismaError.js";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from 'uuid';
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
+import { PubSub } from "graphql-subscriptions";
+import { mailToPasswordChange } from "../../../mail/index.js";
 
 const prisma = new PrismaClient();
+const pubsub = new PubSub();
+
+pubsub.publish('SYNC', {
+  sync: {
+    
+  },
+});
 
 export const Employee = objectType({
   name: "Employee",
@@ -48,6 +59,26 @@ export const Sync = objectType({
     t.field("createdAt", { type: "DateTime" });
     t.field("updatedAt", { type: "DateTime" });
   }
+})
+
+export const sub = subscriptionType({
+  definition(t) {
+    t.string('jwt', {
+      subscribe() {
+        return (async function*() {
+          const accessToken = jwt.sign(
+            { email: "args.email" },
+            process.env.SECRET_TOKEN,
+            { expiresIn: "10m" }
+          );
+          yield accessToken
+        })()
+      },
+      resolve(eventData) {
+        return eventData
+      },
+    })
+  },
 })
 
 export const allEmployees = extendType({
@@ -300,7 +331,7 @@ export const lastSync = extendType({
       async resolve() {
         return await prisma.sync.findFirst({
           orderBy: {
-            id: 'asc'
+            id: 'desc'
           }
         })
       }
@@ -326,15 +357,22 @@ export const syncEmployeesData = extendType({
         const parser = new XMLParser(options);
         let employees = parser.parse(data);
 
-        employees?.directory?.employees?.employee?.map(
-          async (e) => {
+        console.log(employees)
+
+        await employees?.directory?.employees?.employee?.map(
+          async (e, index) =>  {
+
+            const password = uuidv4();
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(password, salt);
+          
+            console.log("UPDATE", index);
             await prisma.employee
               .upsert({
                 where: {
                   email: e?.field[6],
                 },
                 update: {
-                  // password: "",
                   name: e?.field[0],
                   displayName: e?.field[0],
                   jobTitle: e?.field[4],
@@ -344,12 +382,10 @@ export const syncEmployeesData = extendType({
                   division: e?.field[9],
                   manager: e?.field[12],
                   photo: e?.field[14],
-                  // isAdmin: false,
-                  isNewEmployee: false
                 },
                 create: {
                   email: e?.field[6],
-                  password: "",
+                  password: hash,
                   name: e?.field[0],
                   displayName: e?.field[0],
                   jobTitle: e?.field[4],
@@ -362,10 +398,14 @@ export const syncEmployeesData = extendType({
                   isAdmin: false,
                   isNewEmployee: true
                 }
-              })
-            }
-        );
+            }).catch(prismaErr)
+            console.log("UPDATED", index);
+          }
+        )
 
+        await mailToPasswordChange("leo.antony@changecx.com", "createdEmployee?.name", "password")
+
+        console.log("SYNC");
         await prisma.sync.create({
           data: {
             lastSync: currentDateTime
@@ -406,62 +446,57 @@ export const employeeLogin = extendType({
       },
       async resolve(_root, args, ctx) {
 
-        const { data } = await axios.get(
-          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
-        );
-        const options = {
-          ignoreAttributes: true,
-        };
+        // const { data } = await axios.get(
+        //   "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        // );
+        // const options = {
+        //   ignoreAttributes: true,
+        // };
 
-        const parser = new XMLParser(options);
-        let employees = parser.parse(data);
+        // const parser = new XMLParser(options);
+        // let employees = parser.parse(data);
 
-        let existingEmployee =
-          employees?.directory?.employees?.employee?.find(
-            (e) => e?.field[6] === args.email
-          );
+        // let existingEmployee =
+        //   employees?.directory?.employees?.employee?.find(
+        //     (e) => e?.field[6] === args.email
+        //   );
 
-        if (existingEmployee) {
-          console.log(existingEmployee);
-          const accessToken = jwt.sign(
-            { email: args.email },
-            process.env.SECRET_TOKEN,
-            { expiresIn: "10m" }
-          );
-          console.log(accessToken);
+        // if (existingEmployee) {
+          // console.log(existingEmployee);
+          
           const employee = await prisma.employee
-          .upsert({
+          .findUniqueOrThrow({
             where: {
               email: args.email,
             },
-            update: {
-              password: "",
-              name: existingEmployee?.field[0],
-              displayName: existingEmployee?.field[0],
-              jobTitle: existingEmployee?.field[4],
-              mobileNumber: existingEmployee?.field[5].toString(),
-              department: existingEmployee?.field[7],
-              location: existingEmployee?.field[8],
-              division: existingEmployee?.field[9],
-              manager: existingEmployee?.field[12],
-              photo: existingEmployee?.field[14],
-              isNewEmployee: true
-            },
-            create: {
-              email: args.email,
-              password: "",
-              name: existingEmployee?.field[0],
-              displayName: existingEmployee?.field[0],
-              jobTitle: existingEmployee?.field[4],
-              mobileNumber: existingEmployee?.field[5].toString(),
-              department: existingEmployee?.field[7],
-              location: existingEmployee?.field[8],
-              division: existingEmployee?.field[9],
-              manager: existingEmployee?.field[12],
-              photo: existingEmployee?.field[14],
-              isAdmin: false,
-              isNewEmployee: true
-            },
+            // update: {
+            //   password: "",
+            //   name: existingEmployee?.field[0],
+            //   displayName: existingEmployee?.field[0],
+            //   jobTitle: existingEmployee?.field[4],
+            //   mobileNumber: existingEmployee?.field[5].toString(),
+            //   department: existingEmployee?.field[7],
+            //   location: existingEmployee?.field[8],
+            //   division: existingEmployee?.field[9],
+            //   manager: existingEmployee?.field[12],
+            //   photo: existingEmployee?.field[14],
+            //   isNewEmployee: true
+            // },
+            // create: {
+            //   email: args.email,
+            //   password: "",
+            //   name: existingEmployee?.field[0],
+            //   displayName: existingEmployee?.field[0],
+            //   jobTitle: existingEmployee?.field[4],
+            //   mobileNumber: existingEmployee?.field[5].toString(),
+            //   department: existingEmployee?.field[7],
+            //   location: existingEmployee?.field[8],
+            //   division: existingEmployee?.field[9],
+            //   manager: existingEmployee?.field[12],
+            //   photo: existingEmployee?.field[14],
+            //   isAdmin: false,
+            //   isNewEmployee: true
+            // },
             include: {
               employeeSkills: {
                 include: {
@@ -480,19 +515,60 @@ export const employeeLogin = extendType({
               },
             },
           })
-          // .catch(prismaErr);
+          .catch(prismaErr);
 
-          console.log(employee);
+          const accessToken = jwt.sign(
+            { email: args.email },
+            process.env.SECRET_TOKEN,
+            { expiresIn: "10m" }
+          );
 
           return {
             ...employee,
             accessToken,
           };
 
-        }
+        // }
         
         // const pwVerify = await bcrypt.compare(args.password, employee.password);
 
+      },
+    });
+  },
+});
+
+export const employeeLoginWithPassword = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("employeeLoginWithPassword", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+        password: nonNull(stringArg()),
+      },
+      async resolve(_root, args) {          
+        const employee = await prisma.employee
+        .findUniqueOrThrow({
+          where: {
+            email: args.email,
+          }
+        })
+        .catch(prismaErr);
+
+        const pwVerify = await bcrypt.compare(args.password, employee.password);
+
+        if (pwVerify) {
+          const accessToken = jwt.sign(
+            { email: args.email },
+            process.env.SECRET_TOKEN,
+            { expiresIn: "10m" }
+          );
+  
+          return {
+            ...employee,
+            accessToken,
+          };
+        }
       },
     });
   },
@@ -504,17 +580,38 @@ export const employeePasswordReset = extendType({
     t.field("employeePasswordReset", {
       type: "Employee",
       args: {
-        email: nonNull(stringArg()),
+        id: nonNull(stringArg()),
         password: nonNull(stringArg()),
       },
-      async resolve(args) {
+      async resolve(root, args) {
+        let pw = args?.password
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(pw, salt);
         return await prisma.employee.update({
           where: {
-            email: args.email
+            id: args.id
           },
           data: {
-            password: args.password
-          }
+            password: hash,
+            isNewEmployee: false
+          },
+          include: {
+            employeeSkills: {
+              include: {
+                certificate: {
+                  include: {
+                    publisher: true,
+                  },
+                },
+                skill: {
+                  include: {
+                    skill: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+          },
         })
       }
     })
@@ -673,23 +770,124 @@ export const editEmployee = extendType({
   },
 });
 
-// export const deleteEmployee = extendType({
-//   type: "Mutation",
-//   definition(t) {
-//     t.field("deleteEmployee", {
-//       type: "Employee",
-//       args: {
-//         id: nonNull(stringArg()),
-//       },
-//       async resolve(_root, args, ctx) {
-//         return await prisma.employee
-//           .delete({
-//             where: {
-//               id: args.id,
-//             },
-//           })
-//           .catch(prismaErr);
-//       },
-//     });
-//   },
-// });
+export const deleteEmployee = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("deleteEmployee", {
+      type: "Employee",
+      args: {
+        id: nonNull(stringArg()),
+      },
+      async resolve(_root, args, ctx) {
+        return await prisma.employee
+          .delete({
+            where: {
+              id: args.id,
+            },
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+});
+
+
+export const deleteAllEmployees = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("deleteAllEmployees", {
+      type: "Employee",
+      async resolve(_root, args, ctx) {
+        return await prisma.employee
+          .deleteMany({
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+})
+
+  // const password = uuidv4();
+  // const salt = await bcrypt.genSalt(10);
+  // const hash = await bcrypt.hash(password, salt);
+
+  // await prisma.employee
+  //   .upsert({
+  //     where: {
+  //       email: e?.field[6],
+  //     },
+  //     update: {
+  //       name: e?.field[0],
+  //       displayName: e?.field[0],
+  //       jobTitle: e?.field[4],
+  //       mobileNumber: e?.field[5].toString(),
+  //       department: e?.field[7],
+  //       location: e?.field[8],
+  //       division: e?.field[9],
+  //       manager: e?.field[12],
+  //       photo: e?.field[14],
+  //     },
+  //     create: {
+  //       email: e?.field[6],
+  //       password: hash,
+  //       name: e?.field[0],
+  //       displayName: e?.field[0],
+  //       jobTitle: e?.field[4],
+  //       mobileNumber: e?.field[5].toString(),
+  //       department: e?.field[7],
+  //       location: e?.field[8],
+  //       division: e?.field[9],
+  //       manager: e?.field[12],
+  //       photo: e?.field[14],
+  //       isAdmin: false,
+  //       isNewEmployee: true
+  //     }
+  //   }).catch(prismaErr)
+
+
+
+
+  // const employee = await prisma.employee.findUnique({where: {email: e?.field[6]}})
+  // if (employee) {
+  //   console.log("UPDATE", index)
+  //     await prisma.employee.update({
+  //     where: {
+  //       email: e?.field[6],
+  //     },
+  //     data: {
+  //       name: e?.field[0],
+  //       displayName: e?.field[0],
+  //       jobTitle: e?.field[4],
+  //       mobileNumber: e?.field[5].toString(),
+  //       department: e?.field[7],
+  //       location: e?.field[8],
+  //       division: e?.field[9],
+  //       manager: e?.field[12],
+  //       photo: e?.field[14],
+  //     },
+  //   }).catch(prismaErr)
+  //   console.log("UPDATED", index)
+  // } else {
+  //   console.log("CREATE", index)
+  //   const password = uuidv4();
+  //   const salt = await bcrypt.genSalt(10);
+  //   const hash = await bcrypt.hash(password, salt);
+  //   const createdEmployee = await prisma.employee.create({
+  //     data: {
+  //       email: e?.field[6],
+  //       password: hash,
+  //       name: e?.field[0],
+  //       displayName: e?.field[0],
+  //       jobTitle: e?.field[4],
+  //       mobileNumber: e?.field[5].toString(),
+  //       department: e?.field[7],
+  //       location: e?.field[8],
+  //       division: e?.field[9],
+  //       manager: e?.field[12],
+  //       photo: e?.field[14],
+  //       isAdmin: false,
+  //       isNewEmployee: true
+  //     },
+  //   })
+  //   // await mailToPasswordChange("leo.antony@changecx.com", createdEmployee?.name, password)
+  // }

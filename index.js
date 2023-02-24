@@ -1,6 +1,7 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import dotenv from "dotenv";
+import { GraphQLError } from "graphql";
 import { schema } from "./src/schema.js";
 
 dotenv.config();
@@ -11,6 +12,7 @@ const apolloServer = new ApolloServer({
 const port = process.env.PORT || 4001;
 startStandaloneServer(apolloServer, {
   listen: { port },
+  
 }).then((engine) => console.log(`Server ready at: ${engine?.url}`));
 
 

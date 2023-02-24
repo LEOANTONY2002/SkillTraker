@@ -518,7 +518,7 @@ export const employeeLogin = extendType({
           .catch(prismaErr);
 
           const accessToken = jwt.sign(
-            { email: args.email },
+            { employeeId: employee?.id },
             process.env.SECRET_TOKEN,
             { expiresIn: "10m" }
           );

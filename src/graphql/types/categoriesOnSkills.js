@@ -1,6 +1,7 @@
 import { arg, extendType, nonNull, objectType, stringArg } from "nexus";
 import { PrismaClient } from "@prisma/client";
 import { prismaErr } from "../prismaError.js";
+// import { resolveJwtToken } from "./jwtConfig.js";
 
 const prisma = new PrismaClient();
 
@@ -26,6 +27,7 @@ export const allCOS = extendType({
     t.list.field("allCOS", {
       type: "CategoriesOnSkills",
       async resolve(_root, args, ctx) {
+        // await resolveJwtToken(_root)
         return await prisma.categoriesOnSkills
           .findMany({
             orderBy: {

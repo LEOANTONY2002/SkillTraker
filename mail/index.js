@@ -28,12 +28,12 @@ export const mailToCertificateUpload = async (to, name, employeeName, skillName)
     await transporter.sendMail({
         from: "ChangeCX", 
         to, 
-        subject: "One Time Password", 
-        text: "Password Change", 
+        subject: "Certificate Updation", 
+        text: "Certificate Uodation", 
         html: `
             Hi ${name},
             <br />
-            ${employeeName} has just updated a certificate for the skill ${skillName}.
+            <b>${employeeName}</b> has just updated a certificate for the skill <b>${skillName}</b>.
             <br />
         `,
     });

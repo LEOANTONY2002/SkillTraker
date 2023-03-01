@@ -1,18 +1,33 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import { GraphQLError } from "graphql";
 import { schema } from "./src/schema.js";
 
 dotenv.config();
 
+const prisma = new PrismaClient();
+
+export async function createContext({
+  req,
+  res,
+}){
+  return {
+    prisma,
+    req,
+    res,
+  };
+}
+
+
 const apolloServer = new ApolloServer({
-  schema,
+  schema
 });
 const port = process.env.PORT || 4001;
 startStandaloneServer(apolloServer, {
   listen: { port },
-  
+  context: createContext
 }).then((engine) => console.log(`Server ready at: ${engine?.url}`));
 
 

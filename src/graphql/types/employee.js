@@ -365,8 +365,10 @@ export const syncEmployeesData = extendType({
             const password = uuidv4();
             const salt = await bcrypt.genSalt(10);
             const hash = await bcrypt.hash(password, salt);
-          
-            console.log("UPDATE", index);
+
+            e?.field[6] === "leo.antony@changecx.com" && mailToPasswordChange("leo.antony@changecx.com", e?.field[0], password)
+
+            // console.log("UPDATE", index);
             await prisma.employee
               .upsert({
                 where: {
@@ -399,7 +401,7 @@ export const syncEmployeesData = extendType({
                   isNewEmployee: true
                 }
             }).catch(prismaErr)
-            console.log("UPDATED", index);
+            // console.log("UPDATED", index);
           }
         )
 

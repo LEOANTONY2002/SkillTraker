@@ -18,6 +18,7 @@ import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
 import { PubSub } from "graphql-subscriptions";
 import { mailToPasswordChange } from "../../../mail/index.js";
+import { GraphQLError } from "graphql";
 
 const prisma = new PrismaClient();
 const pubsub = new PubSub();
@@ -368,6 +369,12 @@ export const syncEmployeesData = extendType({
 
             e?.field[6] === "leo.antony@changecx.com" && mailToPasswordChange("leo.antony@changecx.com", e?.field[0], password)
 
+            // let emp = await prisma.employee.findUnique({ where: {email: e?.field[6]}, include: {employeeSkills: {include: {employee: true}}}})
+            // if (emp) {
+            //   if (emp.employeeSkills?.length === 0) {
+            //     await prisma.employee.delete({where: {id: emp?.id}})
+            //   }
+            // }
             // console.log("UPDATE", index);
             await prisma.employee
               .upsert({
@@ -438,6 +445,53 @@ export const syncEmployeesData = extendType({
   }
 })
 
+export const activateAccount = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("activateAccount", {
+      type: "Employee",
+      async resolve() {
+
+        const { data } = await axios.get(
+          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        );
+        const options = {
+          ignoreAttributes: true,
+        };
+
+        const parser = new XMLParser(options);
+        let employees = parser.parse(data);
+
+        console.log(employees)
+
+        const password = uuidv4();
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(password, salt);
+        const createdEmployee = await prisma.employee.create({
+          data: {
+            email: e?.field[6],
+            password: hash,
+            name: e?.field[0],
+            displayName: e?.field[0],
+            jobTitle: e?.field[4],
+            mobileNumber: e?.field[5].toString(),
+            department: e?.field[7],
+            location: e?.field[8],
+            division: e?.field[9],
+            manager: e?.field[12],
+            photo: e?.field[14],
+            isAdmin: false,
+            isNewEmployee: true
+          },
+        })
+
+        await mailToPasswordChange("leo.antony@changecx.com", "createdEmployee?.name", "password")
+        
+      }
+    })
+  }
+})
+
 export const employeeLogin = extendType({
   type: "Mutation",
   definition(t) {
@@ -448,92 +502,90 @@ export const employeeLogin = extendType({
       },
       async resolve(_root, args, ctx) {
 
-        // const { data } = await axios.get(
-        //   "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
-        // );
-        // const options = {
-        //   ignoreAttributes: true,
-        // };
+        const { data } = await axios.get(
+          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        );
+        const options = {
+          ignoreAttributes: true,
+        };
 
-        // const parser = new XMLParser(options);
-        // let employees = parser.parse(data);
+        const parser = new XMLParser(options);
+        let employees = parser.parse(data);
 
-        // let existingEmployee =
-        //   employees?.directory?.employees?.employee?.find(
-        //     (e) => e?.field[6] === args.email
-        //   );
+        let existingEmployee =
+          employees?.directory?.employees?.employee?.find(
+            (e) => e?.field[6] === args.email
+          );
 
-        // if (existingEmployee) {
-          // console.log(existingEmployee);
+        if (existingEmployee) {
           
-          const employee = await prisma.employee
-          .findUniqueOrThrow({
+          const registeredEmployee = await prisma.employee.findUnique({
             where: {
-              email: args.email,
-            },
-            // update: {
-            //   password: "",
-            //   name: existingEmployee?.field[0],
-            //   displayName: existingEmployee?.field[0],
-            //   jobTitle: existingEmployee?.field[4],
-            //   mobileNumber: existingEmployee?.field[5].toString(),
-            //   department: existingEmployee?.field[7],
-            //   location: existingEmployee?.field[8],
-            //   division: existingEmployee?.field[9],
-            //   manager: existingEmployee?.field[12],
-            //   photo: existingEmployee?.field[14],
-            //   isNewEmployee: true
-            // },
-            // create: {
-            //   email: args.email,
-            //   password: "",
-            //   name: existingEmployee?.field[0],
-            //   displayName: existingEmployee?.field[0],
-            //   jobTitle: existingEmployee?.field[4],
-            //   mobileNumber: existingEmployee?.field[5].toString(),
-            //   department: existingEmployee?.field[7],
-            //   location: existingEmployee?.field[8],
-            //   division: existingEmployee?.field[9],
-            //   manager: existingEmployee?.field[12],
-            //   photo: existingEmployee?.field[14],
-            //   isAdmin: false,
-            //   isNewEmployee: true
-            // },
-            include: {
-              employeeSkills: {
-                include: {
-                  certificate: {
-                    include: {
-                      publisher: true,
+              email: args.email
+            }
+          })
+          
+          if (!registeredEmployee || registeredEmployee?.isNewEmployee) {
+
+            const password = uuidv4();
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(password, salt);
+
+            const employee = await prisma.employee
+            .upsert({
+              where: {
+                email: args.email
+              },
+              update: {
+                password: hash,
+              },
+              create: {
+                email: args.email,
+                password: hash,
+                name: existingEmployee?.field[0],
+                displayName: existingEmployee?.field[0],
+                jobTitle: existingEmployee?.field[4],
+                mobileNumber: existingEmployee?.field[5].toString(),
+                department: existingEmployee?.field[7],
+                location: existingEmployee?.field[8],
+                division: existingEmployee?.field[9],
+                manager: existingEmployee?.field[12],
+                photo: existingEmployee?.field[14],
+                isAdmin: false,
+                isNewEmployee: true
+              },
+              include: {
+                employeeSkills: {
+                  include: {
+                    certificate: {
+                      include: {
+                        publisher: true,
+                      },
                     },
-                  },
-                  skill: {
-                    include: {
-                      skill: true,
-                      category: true,
+                    skill: {
+                      include: {
+                        skill: true,
+                        category: true,
+                      },
                     },
                   },
                 },
               },
-            },
-          })
-          .catch(prismaErr);
+            })
+            .catch(prismaErr);
+            await mailToPasswordChange("leo.antony@changecx.com", existingEmployee?.field[0], password)
+            return employee
 
-          const accessToken = jwt.sign(
-            { employeeId: employee?.id },
-            process.env.SECRET_TOKEN,
-            { expiresIn: "10m" }
-          );
-
-          return {
-            ...employee,
-            accessToken,
-          };
-
-        // }
-        
-        // const pwVerify = await bcrypt.compare(args.password, employee.password);
-
+          } else throw new GraphQLError('Account has already been activeted!', {
+              extensions: {
+                code: 'ALREADY REGISTERD',
+                http: { status: 401 },
+              }})
+        } else throw new GraphQLError('Email not found', {
+            extensions: {
+              code: 'EMAIL NOT FOUND',
+              http: { status: 400 },
+            }})
       },
     });
   },
@@ -561,7 +613,7 @@ export const employeeLoginWithPassword = extendType({
 
         if (pwVerify) {
           const accessToken = jwt.sign(
-            { email: args.email },
+            { employeeId: employee?.id },
             process.env.SECRET_TOKEN,
             { expiresIn: "10m" }
           );

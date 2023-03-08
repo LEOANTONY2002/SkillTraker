@@ -73,6 +73,7 @@ type EmployeeSkills {
 }
 
 type Mutation {
+  activateAccount: Employee
   addCategory(id: String, name: String!): [Categories]
   addCertificate(employeeId: String!, employeeSkillId: String!, expiry: String, id: String, name: String!, photo: String!, publisherId: String!): Employee
   addEmployee(email: String!, isManager: Boolean, name: String!, password: String!, photo: String, role: String): Employee

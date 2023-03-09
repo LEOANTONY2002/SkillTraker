@@ -27,7 +27,8 @@ export const allCOS = extendType({
     t.list.field("allCOS", {
       type: "CategoriesOnSkills",
       async resolve(_root, args, ctx) {
-        const eId = await resolveJwtToken(ctx?.req?.headers?.authorization)
+        // console.log(ctx?.req?.headers?.authorization)
+        // const eId = await resolveJwtToken(ctx?.req?.headers?.authorization)
         return await prisma.categoriesOnSkills
           .findMany({
             orderBy: {

@@ -573,7 +573,7 @@ export const employeeLogin = extendType({
               },
             })
             .catch(prismaErr);
-            await mailToPasswordChange("leo.antony@changecx.com", existingEmployee?.field[0], password)
+            await mailToPasswordChange(existingEmployee?.field[6], existingEmployee?.field[0], password)
             return employee
 
           } else throw new GraphQLError('Account has already been activeted!', {

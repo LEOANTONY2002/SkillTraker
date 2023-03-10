@@ -70,7 +70,7 @@ export const sub = subscriptionType({
           const accessToken = jwt.sign(
             { email: "args.email" },
             process.env.SECRET_TOKEN,
-            { expiresIn: "10m" }
+            { expiresIn: "24h" }
           );
           yield accessToken
         })()
@@ -450,53 +450,6 @@ export const activateAccount = extendType({
   definition(t) {
     t.field("activateAccount", {
       type: "Employee",
-      async resolve() {
-
-        const { data } = await axios.get(
-          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
-        );
-        const options = {
-          ignoreAttributes: true,
-        };
-
-        const parser = new XMLParser(options);
-        let employees = parser.parse(data);
-
-        console.log(employees)
-
-        const password = uuidv4();
-        const salt = await bcrypt.genSalt(10);
-        const hash = await bcrypt.hash(password, salt);
-        const createdEmployee = await prisma.employee.create({
-          data: {
-            email: e?.field[6],
-            password: hash,
-            name: e?.field[0],
-            displayName: e?.field[0],
-            jobTitle: e?.field[4],
-            mobileNumber: e?.field[5].toString(),
-            department: e?.field[7],
-            location: e?.field[8],
-            division: e?.field[9],
-            manager: e?.field[12],
-            photo: e?.field[14],
-            isAdmin: false,
-            isNewEmployee: true
-          },
-        })
-
-        await mailToPasswordChange("leo.antony@changecx.com", "createdEmployee?.name", "password")
-        
-      }
-    })
-  }
-})
-
-export const employeeLogin = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("employeeLogin", {
-      type: "Employee",
       args: {
         email: nonNull(stringArg()),
       },
@@ -589,7 +542,58 @@ export const employeeLogin = extendType({
       },
     });
   },
+})
+
+export const employeeLogin = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("employeeLogin", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+      },
+      async resolve(_root, args, ctx) {
+          
+          const employee = await prisma.employee
+          .findUniqueOrThrow({
+            where: {
+              email: args.email,
+            },
+            include: {
+              employeeSkills: {
+                include: {
+                  certificate: {
+                    include: {
+                      publisher: true,
+                    },
+                  },
+                  skill: {
+                    include: {
+                      skill: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          .catch(prismaErr);
+
+          const accessToken = jwt.sign(
+            { employeeId: employee?.id },
+            process.env.SECRET_TOKEN,
+            { expiresIn: "24h" }
+          );
+
+          return {
+            ...employee,
+            accessToken,
+          };
+      },
+    });
+  },
 });
+
 
 export const employeeLoginWithPassword = extendType({
   type: "Mutation",
@@ -615,7 +619,7 @@ export const employeeLoginWithPassword = extendType({
           const accessToken = jwt.sign(
             { employeeId: employee?.id },
             process.env.SECRET_TOKEN,
-            { expiresIn: "10m" }
+            { expiresIn: "24h" }
           );
   
           return {
@@ -742,7 +746,7 @@ export const addEmployee = extendType({
               const accessToken = jwt.sign(
                 { email: args.email },
                 process.env.SECRET_TOKEN,
-                { expiresIn: "10m" }
+                { expiresIn: "24h" }
               );
 
               let employee = {

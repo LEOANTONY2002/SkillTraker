@@ -609,7 +609,24 @@ export const employeeLoginWithPassword = extendType({
         .findUniqueOrThrow({
           where: {
             email: args.email,
-          }
+          },
+          include: {
+            employeeSkills: {
+              include: {
+                certificate: {
+                  include: {
+                    publisher: true,
+                  },
+                },
+                skill: {
+                  include: {
+                    skill: true,
+                    category: true,
+                  },
+                },
+              },
+            },
+          },
         })
         .catch(prismaErr);
 

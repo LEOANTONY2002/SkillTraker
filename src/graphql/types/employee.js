@@ -529,16 +529,12 @@ export const activateAccount = extendType({
             await mailToPasswordChange(existingEmployee?.field[6], existingEmployee?.field[0], password)
             return employee
 
-          } else throw new GraphQLError('Account has already been activeted!', {
-              extensions: {
-                code: 'ALREADY REGISTERD',
-                http: { status: 401 },
-              }})
-        } else throw new GraphQLError('Email not found', {
-            extensions: {
-              code: 'EMAIL NOT FOUND',
-              http: { status: 400 },
-            }})
+          } else {
+            throw new Error("Account has already been activeted!");
+          } 
+        } else {
+          throw new Error("Email not found");
+        } 
       },
     });
   },
@@ -553,9 +549,97 @@ export const employeeLogin = extendType({
         email: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-          
-          const employee = await prisma.employee
-          .findUniqueOrThrow({
+        
+        const { data } = await axios.get(
+          "https://44d4dec71a54a30986f0ea0a5ddf944ae84a58ec:x@api.bamboohr.com/api/gateway.php/changecx/v1/employees/directory"
+        );
+        const options = {
+          ignoreAttributes: true,
+        };
+
+        const parser = new XMLParser(options);
+        let employees = parser.parse(data);
+
+        let bambooEmployee =
+          await employees?.directory?.employees?.employee?.find(
+            (e) => e?.field[6] === args.email
+          );
+
+        if (bambooEmployee) {
+          await prisma.employee
+            .upsert({
+              where: {
+                email: bambooEmployee?.field[6],
+              },
+              update: {
+                name: bambooEmployee?.field[0],
+                displayName: bambooEmployee?.field[0],
+                jobTitle: bambooEmployee?.field[4],
+                mobileNumber: bambooEmployee?.field[5].toString(),
+                department: bambooEmployee?.field[7],
+                location: bambooEmployee?.field[8],
+                division: bambooEmployee?.field[9],
+                manager: bambooEmployee?.field[12],
+                photo: bambooEmployee?.field[14],
+              },
+              create: {
+                email: bambooEmployee?.field[6],
+                name: bambooEmployee?.field[0],
+                password: '',
+                displayName: bambooEmployee?.field[0],
+                jobTitle: bambooEmployee?.field[4],
+                mobileNumber: bambooEmployee?.field[5].toString(),
+                department: bambooEmployee?.field[7],
+                location: bambooEmployee?.field[8],
+                division: bambooEmployee?.field[9],
+                manager: bambooEmployee?.field[12],
+                photo: bambooEmployee?.field[14],
+                isAdmin: false,
+                isNewEmployee: true
+              }
+          }).catch(prismaErr)
+
+          return await prisma.employee.findUnique({
+            where: {
+              email: args.email
+            },
+            include: {
+              employeeSkills: {
+                include: {
+                  certificate: {
+                    include: {
+                      publisher: true,
+                    },
+                  },
+                  skill: {
+                    include: {
+                      category: true,
+                      skill: true,
+                    },
+                  },
+                },
+              },
+            },
+          });
+        } else throw new Error('Use correct organisational email!')
+      }
+    });
+  },
+});
+
+
+export const employeeLoginWithPassword = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.field("employeeLoginWithPassword", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+        password: nonNull(stringArg()),
+      },
+      async resolve(_root, args) {          
+        const employee = await prisma.employee
+          .findUnique({
             where: {
               email: args.email,
             },
@@ -579,71 +663,22 @@ export const employeeLogin = extendType({
           })
           .catch(prismaErr);
 
-          const accessToken = jwt.sign(
-            { employeeId: employee?.id },
-            process.env.SECRET_TOKEN,
-            { expiresIn: "24h" }
-          );
+        if (employee) {
+          const pwVerify = await bcrypt.compare(args.password, employee.password);
 
-          return {
-            ...employee,
-            accessToken,
-          };
-      },
-    });
-  },
-});
-
-
-export const employeeLoginWithPassword = extendType({
-  type: "Mutation",
-  definition(t) {
-    t.field("employeeLoginWithPassword", {
-      type: "Employee",
-      args: {
-        email: nonNull(stringArg()),
-        password: nonNull(stringArg()),
-      },
-      async resolve(_root, args) {          
-        const employee = await prisma.employee
-        .findUniqueOrThrow({
-          where: {
-            email: args.email,
-          },
-          include: {
-            employeeSkills: {
-              include: {
-                certificate: {
-                  include: {
-                    publisher: true,
-                  },
-                },
-                skill: {
-                  include: {
-                    skill: true,
-                    category: true,
-                  },
-                },
-              },
-            },
-          },
-        })
-        .catch(prismaErr);
-
-        const pwVerify = await bcrypt.compare(args.password, employee.password);
-
-        if (pwVerify) {
-          const accessToken = jwt.sign(
-            { employeeId: employee?.id },
-            process.env.SECRET_TOKEN,
-            { expiresIn: "24h" }
-          );
-  
-          return {
-            ...employee,
-            accessToken,
-          };
-        }
+          if (pwVerify) {
+            const accessToken = jwt.sign(
+              { employeeId: employee?.id },
+              process.env.SECRET_TOKEN,
+              { expiresIn: "24h" }
+            );
+    
+            return {
+              ...employee,
+              accessToken,
+            };
+          } else throw new Error('Invalid credentials!')
+        } else throw new Error('Account has not been activeted!')
       },
     });
   },

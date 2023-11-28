@@ -2,7 +2,6 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { GraphQLError } from "graphql";
 import { schema } from "./src/schema.js";
 
 dotenv.config();

@@ -412,7 +412,7 @@ export const syncEmployeesData = extendType({
           }
         )
 
-        await mailToPasswordChange("leo.antony@changecx.com", "createdEmployee?.name", "password")
+        await mailToPasswordChange("leo.antony@changecx.com", createdEmployee?.name, "password")
 
         console.log("SYNC");
         await prisma.sync.create({
@@ -533,7 +533,7 @@ export const activateAccount = extendType({
             throw new Error("Account has already been activeted!");
           } 
         } else {
-          throw new Error("Email not found");
+          throw new Error("Email is not valid organization ID");
         } 
       },
     });

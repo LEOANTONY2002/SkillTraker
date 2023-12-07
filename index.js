@@ -21,7 +21,10 @@ export async function createContext({
 
 
 const apolloServer = new ApolloServer({
-  schema
+  schema,
+  fetchOptions: {
+    mode: "no-cors",
+  },
 });
 const port = process.env.PORT || 4001;
 startStandaloneServer(apolloServer, {

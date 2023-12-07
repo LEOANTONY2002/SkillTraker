@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js",
+    "start": "npx prisma generate && node index.js",
     "build": "npm run build"
   },
   "dependencies": {

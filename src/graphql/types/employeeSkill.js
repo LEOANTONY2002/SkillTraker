@@ -1,6 +1,7 @@
 import { extendType, nonNull, objectType, stringArg } from "nexus";
 import { PrismaClient } from "@prisma/client";
 import { prismaErr } from "../prismaError.js";
+import cosineSimilarity from "cosine-similarity";
 
 const prisma = new PrismaClient();
 
@@ -83,7 +84,20 @@ export const addEmployeeSkill = extendType({
         level: nonNull(stringArg()),
       },
       async resolve(_root, args, ctx) {
-        await prisma.employeeSkills
+        const allcos = await prisma.categoriesOnSkills
+          .findMany({
+            orderBy: {
+              employeeSkills: {
+                _count: "desc",
+              },
+            },
+            include: {
+              skill: true,
+              category: true,
+            },
+          })
+          .catch(prismaErr);
+        const updatedEmployeeSkills = await prisma.employeeSkills
           .upsert({
             where: {
               id: args.id ?? "",
@@ -100,6 +114,44 @@ export const addEmployeeSkill = extendType({
             },
           })
           .catch(prismaErr);
+
+        const allSkills = [
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "React",
+          "Node.js",
+          "Python",
+        ];
+        const employeeSkills = ["JavaScript", "HTML", "CSS"];
+
+        function calculateCosineSimilarity(skillSet1, skillSet2) {
+          const vector1 = allSkills.map((skill) =>
+            skillSet1.includes(skill) ? 1 : 0
+          );
+          const vector2 = allSkills.map((skill) =>
+            skillSet2.includes(skill) ? 1 : 0
+          );
+          return cosineSimilarity(vector1, vector2);
+        }
+
+        function recommendSkills(employeeSkills, allSkills) {
+          const recommendations = allSkills
+            .filter((skill) => !employeeSkills.includes(skill))
+            .map((skill) => ({
+              skill,
+              similarity: calculateCosineSimilarity(employeeSkills, [skill]),
+            }))
+            .sort((a, b) => b.similarity - a.similarity);
+
+          return recommendations.map((rec) => rec.skill);
+        }
+
+        const recommendedSkills = await recommendSkills(
+          employeeSkills,
+          allSkills
+        );
+        console.log(recommendedSkills);
 
         return await prisma.employee
           .findUniqueOrThrow({

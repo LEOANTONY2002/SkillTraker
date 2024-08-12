@@ -25,7 +25,7 @@ model Employee {
   department     String?
   division       String?
   isAdmin        Boolean          @default(false)
-  isNewEmployee  Boolean          @default(true)
+  isNewEmployee  Boolean          @default(false)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   employeeSkills EmployeeSkills[]

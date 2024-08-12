@@ -76,7 +76,7 @@ type Mutation {
   activateAccount(email: String!): Employee
   addCategory(id: String, name: String!): [Categories]
   addCertificate(employeeId: String!, employeeSkillId: String!, expiry: String, id: String, name: String!, photo: String!, publisherId: String!): Employee
-  addEmployee(email: String!, isManager: Boolean, name: String!, password: String!, photo: String, role: String): Employee
+  addEmployee(email: String!, jobTitle: String, name: String!, password: String!, photo: String): Employee
   addEmployeeSkill(coskillId: String!, employeeId: String!, id: String, level: String!): Employee
   addPublisher(id: String!, name: String!): [Publishers]
   addSkill(categoryId: String!, name: String!): [CategoriesOnSkills]

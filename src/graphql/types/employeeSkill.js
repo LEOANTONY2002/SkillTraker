@@ -20,7 +20,6 @@ export const EmployeeSkills = objectType({
   },
 });
 
-
 // export const allEmployeeSkills = extendType({
 //   type: "Query",
 //   definition(t) {
@@ -29,7 +28,7 @@ export const EmployeeSkills = objectType({
 //       async resolve(_root, args, ctx) {
 //         return await prisma.employeeSkills.findMany({
 //           // include: {
-//           //   certificate: {include: {publisher: true}},                 
+//           //   certificate: {include: {publisher: true}},
 //           //   skill: {
 //           //     include: {
 //           //       skill: true,
@@ -57,7 +56,7 @@ export const EmployeeSkills = objectType({
 //             employeeId: args.employeeId,
 //           },
 //           include: {
-//             certificate: {include: {publisher: true}},                 
+//             certificate: {include: {publisher: true}},
 //             skill: {
 //               include: {
 //                 skill: true,
@@ -87,7 +86,7 @@ export const addEmployeeSkill = extendType({
         await prisma.employeeSkills
           .upsert({
             where: {
-              id: args.id ?? ""
+              id: args.id ?? "",
             },
             create: {
               employeeId: args.employeeId,
@@ -110,7 +109,7 @@ export const addEmployeeSkill = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: {include: {publisher: true}},                 
+                  certificate: { include: { publisher: true } },
                   skill: {
                     include: {
                       skill: true,
@@ -152,7 +151,7 @@ export const deleteEmployeeSkills = extendType({
             include: {
               employeeSkills: {
                 include: {
-                  certificate: {include: {publisher: true}},                 
+                  certificate: { include: { publisher: true } },
                   skill: {
                     include: {
                       skill: true,

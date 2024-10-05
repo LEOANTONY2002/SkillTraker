@@ -239,39 +239,39 @@ export const searchEmployeeByCategory = extendType({
   },
 });
 
-// export const getEmployee = extendType({
-//   type: "Query",
-//   definition(t) {
-//     t.field("employee", {
-//       type: "Employee",
-//       args: {
-//         email: nonNull(stringArg()),
-//       },
-//       async resolve(_root, args, ctx) {
-//         return await prisma.employee
-//           .findUnique({
-//             where: {
-//               email: args.email,
-//             },
-//             include: {
-//               employeeSkills: {
-//                 include: {
-//                   certificate: {include: {publisher: true}},
-//                   skill: {
-//                     include: {
-//                       skill: true,
-//                       category: true,
-//                     },
-//                   },
-//                 },
-//               },
-//             },
-//           })
-//           .catch(prismaErr);
-//       },
-//     });
-//   },
-// });
+export const getEmployee = extendType({
+  type: "Query",
+  definition(t) {
+    t.field("employee", {
+      type: "Employee",
+      args: {
+        email: nonNull(stringArg()),
+      },
+      async resolve(_root, args, ctx) {
+        return await prisma.employee
+          .findUnique({
+            where: {
+              email: args.email,
+            },
+            include: {
+              employeeSkills: {
+                include: {
+                  certificate: { include: { publisher: true } },
+                  skill: {
+                    include: {
+                      skill: true,
+                      category: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          .catch(prismaErr);
+      },
+    });
+  },
+});
 
 export const allAdmins = extendType({
   type: "Query",

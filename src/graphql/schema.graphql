@@ -112,6 +112,7 @@ type Query {
   category(id: String!): Categories
   certificates: [Certificates]
   cos(skillId: String!): [CategoriesOnSkills]
+  employee(email: String!): Employee
   employees: [Employee]
   lastSync: Sync
   publishers: [Publishers]
